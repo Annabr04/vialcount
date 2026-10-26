@@ -31,6 +31,9 @@ object CycleCount {
     fun acceptVariance(line: CountLine, role: Role, reason: VarianceReason?): DomainResult<CountLine> {
         if (role != Role.LEAD) return err("role", "Only a lead can accept or reject a variance.")
         if (line.status != Status.NEEDS_RECOUNT) return err("state", "That step does not apply to this line.")
+        if (line.secondCount == null) {
+            return err("recount", "A lead can accept a variance only after a recount.")
+        }
         if (reason == null) {
             return err("reason", "A variance needs a reason: damaged, found in another bin, or data error.")
         }

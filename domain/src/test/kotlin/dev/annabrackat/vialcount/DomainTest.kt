@@ -125,8 +125,18 @@ class DomainTest {
     }
 
     @Test
+    fun leadCannotAcceptWithoutRecount() {
+        val pending = line(80, Status.NEEDS_RECOUNT, first = 70)
+        val result = CycleCount.acceptVariance(pending, Role.LEAD, VarianceReason.DAMAGED)
+        assertCode(result, "recount", 80)
+        assertEquals(Status.NEEDS_RECOUNT, pending.status)
+        assertNull(pending.reason)
+        assertNull(pending.secondCount)
+    }
+
+    @Test
     fun missingReasonIsRejected() {
-        val pending = line(40, Status.NEEDS_RECOUNT, first = 10)
+        val pending = line(40, Status.NEEDS_RECOUNT, first = 10, second = 12)
         val result = CycleCount.acceptVariance(pending, Role.LEAD, null)
         assertCode(result, "reason", 40)
         assertEquals(Status.NEEDS_RECOUNT, pending.status)
