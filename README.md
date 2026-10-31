@@ -33,8 +33,8 @@ The allowance is the larger of 2 units and 5 percent of expected. The comparison
 - A quantity below zero is rejected. The error text does not include the expected quantity.
 - A technician or a lead may submit the recount. Copying the first number is not a recount (`same_count`), and the line stays `NEEDS_RECOUNT`.
 - A recount inside the allowance is `ACCEPTED`. A recount that is still outside stays `NEEDS_RECOUNT` for a lead.
-- Only a lead can accept that variance, and only with a reason: damaged, found in another bin, or data error. Only a lead can reject the count.
-- Expected failures return `DomainResult.Err` with a code: `negative`, `state`, `role`, `same_count`, or `reason`. They are not exceptions.
+- Only a lead can accept that variance, and only after a real second count and with a reason: damaged, found in another bin, or data error. Skipping the recount returns code `recount` and leaves the line in `NEEDS_RECOUNT`. Only a lead can reject the count.
+- Expected failures return `DomainResult.Err` with a code: `negative`, `state`, `role`, `same_count`, `recount`, or `reason`. They are not exceptions.
 
 The screen calls these functions. It does not recompute the threshold.
 
