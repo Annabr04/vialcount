@@ -34,6 +34,18 @@ class DomainTest {
     }
 
     @Test
+    fun zeroExpectedAcceptsExactZero() {
+        // Expected 0: only a count of 0 is inside (delta 0). Larger deltas exceed both units and percent.
+        val exact = CycleCount.submitFirstCount(line(0), 0) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, exact.value.status)
+        assertEquals(0, exact.value.firstCount)
+
+        val outside = CycleCount.submitFirstCount(line(0), 3) as DomainResult.Ok
+        assertEquals(Status.NEEDS_RECOUNT, outside.value.status)
+        assertEquals(3, outside.value.firstCount)
+    }
+
+    @Test
     fun copiedRecountIsRejected() {
         val first = (CycleCount.submitFirstCount(line(100), 90) as DomainResult.Ok).value
         assertEquals(Status.NEEDS_RECOUNT, first.status)
