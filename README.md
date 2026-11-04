@@ -16,7 +16,7 @@ Domain tests do not need the Android SDK or a device.
 
 ```bash
 # JDK 17. Android Studio's embedded JDK is enough.
-gradle :domain:test
+gradle :domain:test --no-daemon
 ```
 
 GitHub Actions runs that command on every push. See [`.github/workflows/domain-tests.yml`](.github/workflows/domain-tests.yml).
