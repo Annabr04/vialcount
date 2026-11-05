@@ -35,10 +35,18 @@ class DomainTest {
 
     @Test
     fun zeroExpectedAcceptsExactZero() {
-        // Expected 0: only a count of 0 is inside (delta 0). Larger deltas exceed both units and percent.
+        // Expected 0: deltas of 0, 1 and 2 stay inside the units allowance. Only a delta greater than 2 exceeds both units and percent.
         val exact = CycleCount.submitFirstCount(line(0), 0) as DomainResult.Ok
         assertEquals(Status.ACCEPTED, exact.value.status)
         assertEquals(0, exact.value.firstCount)
+
+        val one = CycleCount.submitFirstCount(line(0), 1) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, one.value.status)
+        assertEquals(1, one.value.firstCount)
+
+        val two = CycleCount.submitFirstCount(line(0), 2) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, two.value.status)
+        assertEquals(2, two.value.firstCount)
 
         val outside = CycleCount.submitFirstCount(line(0), 3) as DomainResult.Ok
         assertEquals(Status.NEEDS_RECOUNT, outside.value.status)
