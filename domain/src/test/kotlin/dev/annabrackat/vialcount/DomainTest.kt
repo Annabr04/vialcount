@@ -117,6 +117,14 @@ class DomainTest {
     }
 
     @Test
+    fun rejectedStatusShowsExpected() {
+        val pending = line(40, Status.NEEDS_RECOUNT, first = 10)
+        val rejected = (CycleCount.rejectCount(pending, Role.LEAD) as DomainResult.Ok).value
+        assertEquals(Status.REJECTED, rejected.status)
+        assertEquals(40, CycleCount.displayExpected(rejected, revealed = false))
+    }
+
+    @Test
     fun recountWithinThresholdAccepts() {
         val first = (CycleCount.submitFirstCount(line(100), 90) as DomainResult.Ok).value
         val second = CycleCount.submitSecondCount(first, 95, Role.TECH) as DomainResult.Ok
