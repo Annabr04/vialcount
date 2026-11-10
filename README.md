@@ -38,6 +38,8 @@ The allowance is the larger of 2 units and 5 percent of expected. The comparison
 
 The screen calls these functions. It does not recompute the threshold.
 
+Completed lines (ACCEPTED or REJECTED) can be exported to a local CSV. The domain provides a pure `exportCompletedToCsv` function that produces the text. The app writes that text to app storage. Columns are sku, name, location, status, first_count, second_count, and reason. Synthetic SKUs only. No timestamps are stored on the model.
+
 ## Layout
 
 | Module | Responsibility |

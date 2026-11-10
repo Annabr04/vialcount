@@ -201,6 +201,24 @@ class DomainTest {
         assertTrue(lines.none { it.name.isBlank() || it.location.isBlank() })
     }
 
+    @Test
+    fun exportCompletedToCsvIncludesStatusCountsAndReason() {
+        val open = line(48)
+        val accepted = (CycleCount.submitFirstCount(open, 48) as DomainResult.Ok).value
+        val pending = line(30, Status.NEEDS_RECOUNT, first = 20, second = 25)
+        val withReason = (CycleCount.acceptVariance(pending, Role.LEAD, VarianceReason.DAMAGED) as DomainResult.Ok).value
+        val rejected = (CycleCount.rejectCount(line(16, Status.NEEDS_RECOUNT, first = 5), Role.LEAD) as DomainResult.Ok).value
+
+        val csv = CycleCount.exportCompletedToCsv(listOf(open, accepted, withReason, rejected))
+        val lines = csv.lines()
+        assertEquals("sku,name,location,status,first_count,second_count,reason", lines[0])
+        assertEquals(4, lines.size) // header + 3 completed
+        assertTrue(csv.contains("VC-1042,Amoxicillin 500 mg capsules,Bay A / Bin 12,ACCEPTED,48,,"))
+        assertTrue(csv.contains("VC-1042,Amoxicillin 500 mg capsules,Bay A / Bin 12,ACCEPTED,20,25,DAMAGED"))
+        assertTrue(csv.contains("VC-1042,Amoxicillin 500 mg capsules,Bay A / Bin 12,REJECTED,5,,"))
+        assertFalse(csv.contains("OPEN"))
+    }
+
     private fun line(
         expected: Int,
         status: Status = Status.OPEN,

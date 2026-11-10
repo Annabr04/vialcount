@@ -53,6 +53,35 @@ object CycleCount {
     }
 
     /**
+     * Pure export of completed lines (ACCEPTED or REJECTED) to CSV.
+     * Synthetic SKUs only. No timestamps exist on the model, so none are included.
+     * Columns: sku,name,location,status,first_count,second_count,reason
+     */
+    fun exportCompletedToCsv(lines: List<CountLine>): String {
+        val header = "sku,name,location,status,first_count,second_count,reason"
+        val completed = lines.filter { it.status == Status.ACCEPTED || it.status == Status.REJECTED }
+        val rows = completed.map { line ->
+            listOf(
+                line.sku,
+                csvEscape(line.name),
+                csvEscape(line.location),
+                line.status.name,
+                line.firstCount?.toString() ?: "",
+                line.secondCount?.toString() ?: "",
+                line.reason?.name ?: "",
+            ).joinToString(",")
+        }
+        return (listOf(header) + rows).joinToString("\n")
+    }
+
+    private fun csvEscape(value: String): String =
+        if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+            "\"${value.replace("\"", "\"\"")}\""
+        } else {
+            value
+        }
+
+    /**
      * The allowance is the larger of 2 units and 5 percent of expected.
      * A count is outside only when it exceeds both.
      * Percent, in integer math: abs(counted - expected) * 100 > expected * 5.

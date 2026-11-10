@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import dev.annabrackat.vialcount.Role
 import dev.annabrackat.vialcount.SeedData
 import dev.annabrackat.vialcount.Status
 import dev.annabrackat.vialcount.VarianceReason
+import java.io.File
 
 class CountViewModel : ViewModel() {
     var role by mutableStateOf(Role.TECH)
@@ -85,6 +87,13 @@ class CountViewModel : ViewModel() {
         notice = null
     }
 
+    fun exportCompleted(context: android.content.Context) {
+        val csv = CycleCount.exportCompletedToCsv(lines)
+        val file = File(context.filesDir, "cycle_counts.csv")
+        file.writeText(csv)
+        notice = "Exported completed lines to app storage: ${file.name}"
+    }
+
     private fun apply(sku: String, result: DomainResult<CountLine>) {
         when (result) {
             is DomainResult.Ok -> {
@@ -131,6 +140,10 @@ fun VialcountApp(model: CountViewModel = viewModel()) {
             }
             item {
                 TextButton(onClick = model::reset) { Text("Reset training counts") }
+            }
+            item {
+                val context = LocalContext.current
+                TextButton(onClick = { model.exportCompleted(context) }) { Text("Export completed to CSV") }
             }
         }
     }
