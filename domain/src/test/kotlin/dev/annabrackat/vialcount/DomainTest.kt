@@ -230,9 +230,7 @@ class DomainTest {
             status = Status.ACCEPTED,
         )
         val csv = CycleCount.exportCompletedToCsv(listOf(special))
-        val lines = csv.lines()
-        assertEquals(2, lines.size)
-        assertTrue(lines[1].startsWith("VC-9999,"))
+        assertTrue(csv.startsWith("sku,name,location,status,first_count,second_count,reason\nVC-9999,"))
         assertTrue(csv.contains("\"Drug, with \"\"quotes\"\" and\nnewline\""))
         assertTrue(csv.contains("\"Bay B, Bin 5\""))
     }
