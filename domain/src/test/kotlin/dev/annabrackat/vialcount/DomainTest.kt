@@ -219,6 +219,24 @@ class DomainTest {
         assertFalse(csv.contains("OPEN"))
     }
 
+    @Test
+    fun exportCompletedToCsvEscapesSpecialCharacters() {
+        val special = CountLine(
+            sku = "VC-9999",
+            name = "Drug, with \"quotes\" and\nnewline",
+            location = "Bay B, Bin 5",
+            expectedQty = 10,
+            firstCount = 10,
+            status = Status.ACCEPTED,
+        )
+        val csv = CycleCount.exportCompletedToCsv(listOf(special))
+        val lines = csv.lines()
+        assertEquals(2, lines.size)
+        assertTrue(lines[1].startsWith("VC-9999,"))
+        assertTrue(csv.contains("\"Drug, with \"\"quotes\"\" and\nnewline\""))
+        assertTrue(csv.contains("\"Bay B, Bin 5\""))
+    }
+
     private fun line(
         expected: Int,
         status: Status = Status.OPEN,
