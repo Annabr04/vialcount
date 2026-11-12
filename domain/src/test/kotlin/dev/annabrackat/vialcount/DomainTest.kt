@@ -255,4 +255,14 @@ class DomainTest {
         assertEquals(code, err.code)
         assertFalse(err.message.contains(expectedQty.toString()), err.message)
     }
+
+    @Test
+    fun exportCompletedToCsvWithNoCompletedLinesIsHeaderOnly() {
+        val open = line(10)
+        val pending = line(20, Status.NEEDS_RECOUNT, first = 15)
+        val csv = CycleCount.exportCompletedToCsv(listOf(open, pending))
+        assertEquals("sku,name,location,status,first_count,second_count,reason", csv)
+        assertFalse(csv.contains("\n"))
+    }
+
 }
