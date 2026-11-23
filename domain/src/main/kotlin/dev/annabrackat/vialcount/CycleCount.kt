@@ -74,6 +74,13 @@ object CycleCount {
         return (listOf(header) + rows).joinToString("\n")
     }
 
+
+    /**
+     * Number of completed lines (ACCEPTED or REJECTED). OPEN and NEEDS_RECOUNT are ignored.
+     */
+    fun completedLineCount(lines: List<CountLine>): Int =
+        lines.count { it.status == Status.ACCEPTED || it.status == Status.REJECTED }
+
     private fun csvEscape(value: String): String =
         if (value.contains(',') || value.contains('"') || value.contains('\n')) {
             "\"${value.replace("\"", "\"\"")}\""

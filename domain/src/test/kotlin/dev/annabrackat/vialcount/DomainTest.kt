@@ -235,6 +235,22 @@ class DomainTest {
         assertTrue(csv.contains("\"Bay B, Bin 5\""))
     }
 
+
+    @Test
+    fun completedLineCountIgnoresOpenAndNeedsRecount() {
+        val open = line(10)
+        val pending = line(20, Status.NEEDS_RECOUNT, first = 15)
+        val accepted = (CycleCount.submitFirstCount(line(48), 48) as DomainResult.Ok).value
+        val rejected = (CycleCount.rejectCount(line(16, Status.NEEDS_RECOUNT, first = 5), Role.LEAD) as DomainResult.Ok).value
+
+        val mix = listOf(open, pending, accepted, rejected)
+        assertEquals(2, CycleCount.completedLineCount(mix))
+
+        assertEquals(0, CycleCount.completedLineCount(emptyList()))
+        assertEquals(0, CycleCount.completedLineCount(listOf(open, pending)))
+        assertEquals(1, CycleCount.completedLineCount(listOf(accepted)))
+    }
+
     private fun line(
         expected: Int,
         status: Status = Status.OPEN,
