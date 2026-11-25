@@ -251,6 +251,33 @@ class DomainTest {
         assertEquals(1, CycleCount.completedLineCount(listOf(accepted)))
     }
 
+
+    @Test
+    fun secondCountOnZeroExpectedUsesUnitsAllowance() {
+        // First count of 3 on expected 0 is outside both allowances, so NEEDS_RECOUNT.
+        val first = (CycleCount.submitFirstCount(line(0), 3) as DomainResult.Ok).value
+        assertEquals(Status.NEEDS_RECOUNT, first.status)
+        assertEquals(3, first.firstCount)
+
+        // Second count of 0, 1, or 2 stays inside the 2-unit allowance and is ACCEPTED.
+        val zero = CycleCount.submitSecondCount(first, 0, Role.TECH) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, zero.value.status)
+        assertEquals(0, zero.value.secondCount)
+
+        val one = CycleCount.submitSecondCount(first, 1, Role.LEAD) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, one.value.status)
+        assertEquals(1, one.value.secondCount)
+
+        val two = CycleCount.submitSecondCount(first, 2, Role.TECH) as DomainResult.Ok
+        assertEquals(Status.ACCEPTED, two.value.status)
+        assertEquals(2, two.value.secondCount)
+
+        // Second count of 4 exceeds 2 units (and the zero percent band) and stays NEEDS_RECOUNT.
+        val outside = CycleCount.submitSecondCount(first, 4, Role.LEAD) as DomainResult.Ok
+        assertEquals(Status.NEEDS_RECOUNT, outside.value.status)
+        assertEquals(4, outside.value.secondCount)
+    }
+
     private fun line(
         expected: Int,
         status: Status = Status.OPEN,
